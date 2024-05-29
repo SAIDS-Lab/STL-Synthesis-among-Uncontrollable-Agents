@@ -13,7 +13,7 @@ train_num = 500 # Number of training traces for each room.
 calib_num = 500 # Number of calibration traces for each room.
 test_num = 1000 # Number of test traces for each room.
 num_traces = train_num + calib_num + test_num
-
+lcp_optimization_size = 100 # The size of calibration data allocated for solving the LCP in the baseline model.
 
 
 
