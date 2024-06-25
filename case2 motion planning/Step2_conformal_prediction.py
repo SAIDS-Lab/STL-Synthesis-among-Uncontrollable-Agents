@@ -77,21 +77,25 @@ def obtain_predicitons():
         r2_train = json.load(f)
     with open("data_original/r2_calib.json") as f:
         r2_calib = json.load(f)
+    with open("data_original/r2_test.json") as f:
+        r2_test = json.load(f)
 
     print("Starting to compute predictions. \n")
 
-    r2_calib_predictions, r2_train_predictions = dict(), dict()
+    r2_calib_predictions, r2_train_predictions, r2_test_prediction = dict(), dict(), dict()
     for k in range(total_time - 1):
         model = keras.models.load_model(f'predictors/predictor_{k}.keras')
         len_in = k + 1
         r2_calib_predictions[k] = generate_predictions(r2_calib, len_in, model)
         r2_train_predictions[k] = generate_predictions(r2_train, len_in, model)
-
+        r2_test_prediction[k] = generate_predictions(r2_test, len_in, model)
 
     with open('data_cp/r2_calib_prediction.json', 'w') as f:
         json.dump(r2_calib_predictions , f)
     with open('data_cp/r2_train_prediction.json', 'w') as f:
         json.dump(r2_train_predictions, f)
+    with open('data_cp/r2_test_prediction.json', 'w') as f:
+        json.dump(r2_test_prediction, f)
     print("Computing predictions completed, and all the predictions have been saved. \n")
 
 

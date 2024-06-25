@@ -71,8 +71,6 @@ def compute_quantiles(delta, room2_calib, room2_calib_prediction, room3_calib, r
     return c_open, c_close
 
 
-
-
 def obtain_predicitons():
     with open("data_original/room2_train.json") as f:
         room2_train = json.load(f)
@@ -82,27 +80,38 @@ def obtain_predicitons():
         room2_calib = json.load(f)
     with open("data_original/room3_calib.json") as f:
         room3_calib = json.load(f)
+    with open("data_original/room2_test.json") as f:
+        room2_test = json.load(f)
+    with open("data_original/room3_test.json") as f:
+        room3_test = json.load(f)
 
     print("Starting to compute predictions. \n")
 
     room2_calib_predictions, room2_train_predictions, room3_calib_predictions, room3_train_predictions = dict(), dict(), dict(), dict()
+    room2_test_predictions, room3_test_predictions = dict(), dict() # prepare for future analysis
     for k in range(total_time - 1):
         model2 = keras.models.load_model(f'predictors/predictor2_{k}.keras')
         model3 = keras.models.load_model(f'predictors/predictor3_{k}.keras')
         len_in = k + buffer + 1
         room2_calib_predictions[k] = generate_predictions(room2_calib, len_in, model2)
         room2_train_predictions[k] = generate_predictions(room2_train, len_in, model2)
+        room2_test_predictions[k] = generate_predictions(room2_test, len_in, model2)
         room3_calib_predictions[k] = generate_predictions(room3_calib, len_in, model3)
         room3_train_predictions[k] = generate_predictions(room3_train, len_in, model3)
+        room3_test_predictions[k] = generate_predictions(room3_test, len_in, model3)
 
     with open('data_cp/room2_calib_prediction.json', 'w') as f:
         json.dump(room2_calib_predictions , f)
     with open('data_cp/room2_train_prediction.json', 'w') as f:
         json.dump(room2_train_predictions, f)
+    with open('data_cp/room2_test_prediction.json', 'w') as f:
+        json.dump(room2_test_predictions, f)
     with open('data_cp/room3_calib_prediction.json', 'w') as f:
         json.dump(room3_calib_predictions, f)
     with open('data_cp/room3_train_prediction.json', 'w') as f:
         json.dump(room3_train_predictions, f)
+    with open('data_cp/room3_test_prediction.json', 'w') as f:
+        json.dump(room3_test_predictions, f)
 
     print("Computing predictions completed, and all the predictions have been saved. \n")
 
@@ -145,6 +154,6 @@ def obtain_sigmas_and_c():
 
 
 if __name__ == '__main__':
-    # obtain_predicitons()
+    obtain_predicitons()
     obtain_sigmas_and_c()
     
