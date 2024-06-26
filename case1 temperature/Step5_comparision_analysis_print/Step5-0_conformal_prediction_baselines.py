@@ -3,6 +3,11 @@ In this file, we compare the LCP-based CP algorithm with our methods for open lo
 """
 
 import json
+import sys
+import os
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
 from parameters import *
 import casadi as ca
 import numpy as np
