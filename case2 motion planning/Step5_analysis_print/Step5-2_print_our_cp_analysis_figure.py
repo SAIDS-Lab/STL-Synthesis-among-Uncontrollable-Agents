@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path'))
+module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
