@@ -3,33 +3,34 @@ import json
 import numpy as np
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
 import random
 
+
 random.seed(123)
 bin_width= 0.01
 
-with open("data_cp/c_open.json") as f:
+with open("case2 motion planning/data_cp/c_open.json") as f:
     c_open = json.load(f)
-with open("data_cp/c_close.json") as f:
+with open("case2 motion planning/data_cp/c_close.json") as f:
     c_close = json.load(f)
 
 
 # Calculate the percentage of test data satisfying theorem 1:
-with open('data_original/r2_test.json') as f:
+with open('case2 motion planning/data_original/r2_test.json') as f:
     r2_test = json.load(f)
-with open('data_original/r2_calib.json') as f:
+with open('case2 motion planning/data_original/r2_calib.json') as f:
     r2_cal = json.load(f)
-with open('data_cp/r2_sigmas.json') as f:
+with open('case2 motion planning/data_cp/r2_sigmas.json') as f:
     r2_sigmas = json.load(f)
 
 print("Load predictions.")
-with open('data_cp/r2_test_prediction.json', 'r') as f:
+with open('case2 motion planning/data_cp/r2_test_prediction.json', 'r') as f:
     r2_test_prediction = json.load(f)
-with open('data_cp/r2_calib_prediction.json', 'r') as f:
+with open('case2 motion planning/data_cp/r2_calib_prediction.json', 'r') as f:
     r2_calib_prediction = json.load(f)
 
 
@@ -54,10 +55,11 @@ def compute_quantiles(delta, r2_calib, r2_calib_prediction, r2_sigmas):
     for j in range(len(r2_calib)):
         r = []
         for k in range(total_time - 1):
-            ground = r2_calib[j][k + 1]
-            prediction = r2_calib_prediction[str(k)][j][0]
-            nonconformity = np.linalg.norm([a - b for a, b in zip(ground, prediction)]) / r2_sigmas[str(k)][str(k+1)]
-            r.append(nonconformity)
+            for tau in range(k + 1, total_time):
+                ground = r2_calib[j][tau]
+                prediction = r2_calib_prediction[str(k)][j][tau-k-1]
+                nonconformity = np.linalg.norm([a - b for a, b in zip(ground, prediction)]) / r2_sigmas[str(k)][str(tau)]
+                r.append(nonconformity)
         r_close_nonconformity_list.append(max(r))
 
     p = int(np.ceil((len(r2_calib) + 1) * (1 - delta)))
@@ -84,7 +86,7 @@ def sample_from_test_predictions(data_set, sample_inds):
     return new_data_set
 
 num_trials = 1000
-num_samples_each_trial = 50
+num_samples_each_trial = 150
 bin_width= 1/num_samples_each_trial
 
 for i in range(num_trials):
@@ -116,12 +118,14 @@ for i in range(num_trials):
     if count == correct_count:
         stmt_1_value += 1
 
+
     count = 0
     correct_count = 0
     for k in range(len(test_predictions_r2_sample["0"][0])):
-        if np.linalg.norm([a - b for a, b in zip(r2_test_sample[0][k+1], test_predictions_r2_sample[str(k)][0][0])]) <= c2 * r2_sigmas[str(k)][str(k + 1)]:
-            correct_count += 1
-        count += 1
+        for tau in range(k + 1, len(test_predictions_r2_sample["0"][0])):
+            if np.linalg.norm([a - b for a, b in zip(r2_test_sample[0][tau], test_predictions_r2_sample[str(k)][0][tau-k-1])]) <= c2 * r2_sigmas[str(k)][str(tau)]:
+                correct_count += 1
+            count += 1
     if count == correct_count:
         stmt_2_value += 1
 
@@ -143,16 +147,17 @@ for i in range(num_trials):
         count = 0
         correct_count = 0
         for k in range(len(test_predictions_r2_sample["0"][0])):
-            if np.linalg.norm([a - b for a, b in zip(r2_test_sample[j][k+1], test_predictions_r2_sample[str(k)][j][0])]) <= c2 * r2_sigmas[str(k)][str(k + 1)]:
-                correct_count += 1
-            count += 1
+            for tau in range(k + 1, len(test_predictions_r2_sample["0"][0])):
+                if np.linalg.norm([a - b for a, b in zip(r2_test_sample[j][tau], test_predictions_r2_sample[str(k)][j][tau-k-1])]) <= c2 * r2_sigmas[str(k)][str(tau)]:
+                    correct_count += 1
+                count += 1
         if count == correct_count:
             correct_count_stmt_2 += 1
     stmt_2_coverages.append(correct_count_stmt_2 / num_samples_each_trial)
 
-with open('data_cp/test_result_stmt_1.json', 'w') as f:
+with open('case2 motion planning/data_cp/test_result_stmt_1.json', 'w') as f:
     json.dump(stmt_1_coverages, f)
-with open('data_cp/test_result_stmt_2.json', 'w') as f:
+with open('case2 motion planning/data_cp/test_result_stmt_2.json', 'w') as f:
     json.dump(stmt_2_coverages, f)
 
 print("the result 1 in the paper is", stmt_1_value/num_trials)

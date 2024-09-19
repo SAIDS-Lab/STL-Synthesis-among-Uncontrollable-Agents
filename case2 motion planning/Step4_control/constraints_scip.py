@@ -6,16 +6,16 @@ from pyscipopt import *
 
 
 
-def addConstr(model, x1, u1, r2_trace, k, r2_c):
+def addConstr(model, test_index, x1, u1, r2_trace_list, k, r2_c):
 
     # system model constraints
     # known state
     for i in range(0, k+1):
         for j in range(4):
-            model.addCons(x1[i, j] == optimal_state_sequence[i][j])  
+            model.addCons(x1[i, j] == optimal_state_sequence[test_index][i][j])  
     for i in range(0, k):
         for j in range(2):
-            model.addCons(u1[i, j] == optimal_control_sequence[i][j])  
+            model.addCons(u1[i, j] == optimal_control_sequence[test_index][i][j])  
     
     # model [1,T]
     for i in range(k, total_time-1):
@@ -52,17 +52,39 @@ def addConstr(model, x1, u1, r2_trace, k, r2_c):
             model.addCons(G_track_mu[i] <= G_track_mu_4[i, j])
         model.addCons(G_track_mu[i] >= 1- 4 + sum(G_track_mu_4[i, j] for j in range(4)))
 
+    q_track = {}
+    for i in range(G_track_len - k - 1):
+        for s in range(k+1):
+            for j in range(4):
+                q_track[i, s, j] = model.addVar(vtype="B")
+
     for i in range(G_track_len): 
-        if i > k:
-            model.addCons(-x1[G_track_t[0] + i, 0] + (r2_trace[G_track_t[0] + i][0] + r2_c[str(k)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 0]) - epsilon)
-            model.addCons(-(r2_trace[G_track_t[0] + i][0] - r2_c[str(k)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 0] - D <= M * (1 - G_track_mu_4[i, 1]) - epsilon)
-            model.addCons(-x1[G_track_t[0] + i, 2] + (r2_trace[G_track_t[0] + i][1] + r2_c[str(k)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 2]) - epsilon)
-            model.addCons(-(r2_trace[G_track_t[0] + i][1]-r2_c[str(k)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 2] - D <= M * (1 - G_track_mu_4[i, 3]) - epsilon)
+        if G_track_t[0] + i > k:
+            for s in range(k+1):
+                model.addCons(-x1[G_track_t[0] + i, 0] + (r2_trace_list[s][G_track_t[0] + i][0] + r2_c[str(s)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 0]) - 2 * epsilon + M*(1- q_track[i-k- 1, s, 0]))
+                model.addCons(-(r2_trace_list[s][G_track_t[0] + i][0] + r2_c[str(s)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 0] + D + M * (1 - G_track_mu_4[i, 0]) <=  +M*q_track[i-k- 1, s, 0])
+                model.addCons(-(r2_trace_list[s][G_track_t[0] + i][0] - r2_c[str(s)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 0] - D <= M * (1 - G_track_mu_4[i, 1]) -2 * epsilon + M*(1- q_track[i-k- 1, s, 1])) 
+                model.addCons(-x1[G_track_t[0] + i, 0] + (r2_trace_list[s][G_track_t[0] + i][0] - r2_c[str(s)][str(i+G_track_t[0])]) + D + M * (1 - G_track_mu_4[i, 1]) <=  M*q_track[i-k- 1, s, 1])
+
+                model.addCons(-x1[G_track_t[0] + i, 2] + (r2_trace_list[s][G_track_t[0] + i][1] + r2_c[str(s)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 2]) - 2 * epsilon + M*(1- q_track[i-k- 1, s, 2]))
+                model.addCons(-(r2_trace_list[s][G_track_t[0] + i][1] + r2_c[str(s)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 2] + D + M * (1 - G_track_mu_4[i, 2]) <=  M*q_track[i-k- 1, s, 2])
+                model.addCons(-(r2_trace_list[s][G_track_t[0] + i][1] - r2_c[str(s)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 2] - D <= M * (1 - G_track_mu_4[i, 3]) -2 * epsilon + M*(1- q_track[i-k- 1, s, 3])) 
+                model.addCons(-x1[G_track_t[0] + i, 2] + (r2_trace_list[s][G_track_t[0] + i][1] - r2_c[str(s)][str(i+G_track_t[0])]) + D + M * (1 - G_track_mu_4[i, 3]) <=  M*q_track[i-k- 1, s, 3])
+
+            model.addCons(sum(q_track[i-k-1, s, 0] for s in range(k+1)) >=1)
+            model.addCons(sum(q_track[i-k-1, s, 1] for s in range(k+1)) >=1)
+            model.addCons(sum(q_track[i-k-1, s, 2] for s in range(k+1)) >=1)
+            model.addCons(sum(q_track[i-k-1, s, 3] for s in range(k+1)) >=1)
+
+            # model.addCons(-x1[G_track_t[0] + i, 0] + (r2_trace[G_track_t[0] + i][0] + r2_c[str(k)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 0]) - epsilon)
+            # model.addCons(-(r2_trace[G_track_t[0] + i][0] - r2_c[str(k)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 0] - D <= M * (1 - G_track_mu_4[i, 1]) - epsilon)
+            # model.addCons(-x1[G_track_t[0] + i, 2] + (r2_trace[G_track_t[0] + i][1] + r2_c[str(k)][str(i+G_track_t[0])]) - D <= M * (1 - G_track_mu_4[i, 2]) - epsilon)
+            # model.addCons(-(r2_trace[G_track_t[0] + i][1]-r2_c[str(k)][str(i+G_track_t[0])]) + x1[G_track_t[0] + i, 2] - D <= M * (1 - G_track_mu_4[i, 3]) - epsilon)
         else:
-            model.addCons(-x1[G_track_t[0] + i, 0] + r2_trace[G_track_t[0] + i][0] - D <= M * (1 - G_track_mu_4[i, 0]) - epsilon)
-            model.addCons(-r2_trace[G_track_t[0] + i][0] + x1[G_track_t[0] + i, 0] - D <= M * (1 - G_track_mu_4[i, 1]) - epsilon)
-            model.addCons(-x1[G_track_t[0] + i, 2] + r2_trace[G_track_t[0] + i][1] - D <= M * (1 - G_track_mu_4[i, 2]) - epsilon)
-            model.addCons(-r2_trace[G_track_t[0] + i][1] + x1[G_track_t[0] + i, 2] - D <= M * (1 - G_track_mu_4[i, 3]) - epsilon)
+            model.addCons(-x1[G_track_t[0] + i, 0] + r2_trace_list[k][G_track_t[0] + i][0] - D <= M * (1 - G_track_mu_4[i, 0]) - epsilon)
+            model.addCons(-r2_trace_list[k][G_track_t[0] + i][0] + x1[G_track_t[0] + i, 0] - D <= M * (1 - G_track_mu_4[i, 1]) - epsilon)
+            model.addCons(-x1[G_track_t[0] + i, 2] + r2_trace_list[k][G_track_t[0] + i][1] - D <= M * (1 - G_track_mu_4[i, 2]) - epsilon)
+            model.addCons(-r2_trace_list[k][G_track_t[0] + i][1] + x1[G_track_t[0] + i, 2] - D <= M * (1 - G_track_mu_4[i, 3]) - epsilon)
 
     G_obs = model.addVar(vtype="B")
     G_obs_mu = {}
@@ -117,8 +139,7 @@ def addConstr(model, x1, u1, r2_trace, k, r2_c):
         model.addCons( - x1[G_obs_t[0] + i, 2] + (mu_obs3_y[1] + p_obs) <= M * (1 - G_obs3_mu_4[i, 3]))
 
     
-    model.addCons(G_track == 1)
-    model.addCons(G_obs == 1)
+
 
     
 
@@ -155,7 +176,9 @@ def addConstr(model, x1, u1, r2_trace, k, r2_c):
         model.addCons( - x1[FG_t[0] + i, 2] + mu4y[0] <= M * (1 - FG_mu_4[i, 2]))
         model.addCons(x1[FG_t[0] + i, 2] - mu4y[1] <= M * (1 - FG_mu_4[i, 3]))
 
-
-    # model.addCons(G2 == 1)
-    # model.addCons(G1 == 1)
     model.addCons(FG == 1)
+    model.addCons(G_track == 1)
+    model.addCons(G_obs == 1)
+
+    return G_track_mu_4,q_track
+

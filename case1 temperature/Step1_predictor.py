@@ -38,9 +38,8 @@ def lstm_net_train(data, k):
     model.add(Dense(20))
     model.add(Dense(len_seq - len_in))
     model.compile(loss='mean_squared_error', optimizer='adam')
-    model.fit(train_data_x, train_data_y, epochs=1000, batch_size=1, verbose=0, callbacks=[custom_callback])
+    model.fit(train_data_x, train_data_y, epochs=500, batch_size=1, verbose=0, callbacks=[custom_callback])
     return model
-    
 
    
 
@@ -51,7 +50,7 @@ def lstm_eval():
     len_in = k + buffer + 1
     with open("data_original/room3_calib.json") as f:
         room_calib = json.load(f)
-    model = keras.models.load_model(f'predictors/predictor3_{k}.keras')
+    model = keras.models.load_model(f'predictors/predictor2_{k}.keras')
 
     calib_data_x = [item[:len_in] for item in room_calib]
     calib_data_y = [item[len_in:len_seq] for item in room_calib]
@@ -75,9 +74,9 @@ def lstm_eval():
 
 
 def train_lstms():
-    with open("data_original/room2_train.json") as f:
+    with open("case1 temperature/data_original/room2_train.json") as f:
         room2_train = json.load(f)
-    with open("data_original/room3_train.json") as f:
+    with open("case1 temperature/data_original/room3_train.json") as f:
         room3_train = json.load(f)
 
     print("Starting to train the LSTMs. \n")
@@ -85,9 +84,9 @@ def train_lstms():
     for k in range(total_time - 1):
         print("training the predictor at time step:", k)
         model = lstm_net_train(room2_train, k)
-        model.save(f'predictors/predictor2_{k}.keras')
+        model.save(f'case1 temperature/predictors/predictor2_{k}.keras')
         model = lstm_net_train(room3_train, k)
-        model.save(f'predictors/predictor3_{k}.keras')
+        model.save(f'case1 temperature/predictors/predictor3_{k}.keras')
 
     print("LSTMs have been saved in the folder called predictors. \n")
 
@@ -95,9 +94,9 @@ def train_lstms():
 
 
 if __name__ == '__main__':
-    # train_lstms()
+    train_lstms()
 
-    lstm_eval()
+    # lstm_eval()
 
     
 

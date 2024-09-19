@@ -1,6 +1,6 @@
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 import json
@@ -11,9 +11,9 @@ from Step4_control.parameters_control import *
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Rectangle, Circle
 
-with open("data_controlresults/r1_trace_list_closedloop.json") as f:
+with open("case2 motion planning/data_controlresults/r1_trace_list_closedloop.json") as f:
     r1_trace_list_closedloop = json.load(f)
-with open("data_controlresults/r2_trace_list_closedloop.json") as f:
+with open("case2 motion planning/data_controlresults/r2_trace_list_closedloop.json") as f:
     r2_trace_list_closedloop = json.load(f)
 
 index = 0
@@ -66,4 +66,4 @@ time_list = list(range(total_time-1))
 
 ani = FuncAnimation(fig, update, frames=len(time_list), repeat=True)
 
-ani.save('fig/case2.mp4', fps=2, extra_args=['-vcodec', 'libx264'])
+ani.save('case2 motion planning/fig/case2.mp4', fps=2, extra_args=['-vcodec', 'libx264'])

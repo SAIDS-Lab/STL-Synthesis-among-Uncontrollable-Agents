@@ -12,7 +12,7 @@ from parameters import *
 import json
 
 # Set a seed.
-random.seed(24)
+random.seed(12)
 
 
 class Room:
@@ -66,6 +66,7 @@ class Room:
         return trace
 
 
+
 def test_class():
     """
     Test the class implemented.
@@ -93,17 +94,17 @@ def collect_data():
     room2_train, room2_calib, room2_test = room2_temperatures[:train_num], room2_temperatures[train_num:train_num + calib_num], room2_temperatures[train_num + calib_num:]
     room3_train, room3_calib, room3_test = room3_temperatures[:train_num], room3_temperatures[train_num:train_num + calib_num], room3_temperatures[train_num + calib_num:]
     
-    with open('data_original/room2_train.json', 'w') as f:
+    with open('case1 temperature/data_original/room2_train.json', 'w') as f:
         json.dump(room2_train, f)
-    with open('data_original/room2_calib.json', 'w') as f:
+    with open('case1 temperature/data_original/room2_calib.json', 'w') as f:
         json.dump(room2_calib, f)
-    with open('data_original/room2_test.json', 'w') as f:
+    with open('case1 temperature/data_original/room2_test.json', 'w') as f:
         json.dump(room2_test, f)
-    with open('data_original/room3_train.json', 'w') as f:
+    with open('case1 temperature/data_original/room3_train.json', 'w') as f:
         json.dump(room3_train, f)
-    with open('data_original/room3_calib.json', 'w') as f:
+    with open('case1 temperature/data_original/room3_calib.json', 'w') as f:
         json.dump(room3_calib, f)
-    with open('data_original/room3_test.json', 'w') as f:
+    with open('case1 temperature/data_original/room3_test.json', 'w') as f:
         json.dump(room3_test, f)
     
 

@@ -38,11 +38,11 @@ while count <= num_traces:
 r2_train, r2_calib, r2_test = data_r2[:train_num], data_r2[train_num:train_num + calib_num], data_r2[train_num + calib_num:]
 
 
-with open('data_original/r2_train.json', 'w') as f:
+with open('case2 motion planning/data_original/r2_train.json', 'w') as f:
     json.dump(r2_train, f)
-with open('data_original/r2_calib.json', 'w') as f:
+with open('case2 motion planning/data_original/r2_calib.json', 'w') as f:
     json.dump(r2_calib, f)
-with open('data_original/r2_test.json', 'w') as f:
+with open('case2 motion planning/data_original/r2_test.json', 'w') as f:
     json.dump(r2_test, f)
 
 

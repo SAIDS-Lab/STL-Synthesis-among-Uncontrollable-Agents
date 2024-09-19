@@ -51,9 +51,9 @@ def lstm_eval():
     index = 1
     k = 10
     len_in = k + 1
-    with open("data_original/r2_calib.json") as f:
+    with open("case2 motion planning/data_original/r2_calib.json") as f:
         room_calib = json.load(f)
-    model = keras.models.load_model(f'predictors/predictor_{k}.keras')
+    model = keras.models.load_model(f'case2 motion planning/predictors/predictor_{k}.keras')
 
 
     calib_data_x = [item[:len_in] for item in room_calib]
@@ -79,14 +79,14 @@ def lstm_eval():
 
 
 def train_lstms():
-    with open("data_original/r2_train.json") as f:
+    with open("case2 motion planning/data_original/r2_train.json") as f:
         r2_train = json.load(f)
     print("Starting to train the LSTMs. \n")
 
     for k in range(total_time - 1):
         print("training the predictor at time step:", k)
         model = lstm_net_train(r2_train, k)
-        model.save(f'predictors/predictor_{k}.keras')
+        model.save(f'case2 motion planning/predictors/predictor_{k}.keras')
 
     print("LSTMs have been saved in the folder called predictors. \n")
 

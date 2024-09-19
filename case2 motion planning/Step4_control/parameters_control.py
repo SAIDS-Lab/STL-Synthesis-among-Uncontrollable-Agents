@@ -1,13 +1,13 @@
 import json
 
 
-with open('data_pre_control/c_close_r2.json', 'r') as json_file:
+with open('case2 motion planning/data_pre_control/c_close_r2.json', 'r') as json_file:
     c_close = json.load(json_file)
-with open('data_pre_control/c_open_r2.json', 'r') as json_file:
+with open('case2 motion planning/data_pre_control/c_open_r2.json', 'r') as json_file:
     c_open = json.load(json_file)
-with open('data_pre_control/r2_ground.json', 'r') as json_file:
+with open('case2 motion planning/data_pre_control/r2_ground.json', 'r') as json_file:
     r2_ground = json.load(json_file)
-with open('data_pre_control/r2_test_predictions.json', 'r') as json_file:
+with open('case2 motion planning/data_pre_control/r2_test_predictions.json', 'r') as json_file:
     y2_prediction_list= json.load(json_file)
 
 
@@ -40,7 +40,7 @@ p_obs= 0.3
 
 umax = 1
 vmax = 1.5
-M = 10000
+M = 100
 epsilon = 0.0001
 
 G_track_t = [0, total_time-1]
@@ -61,10 +61,14 @@ FG_Glen = FG_t[3]- FG_t[2] + 1
 FG_len = FG_t[1] + FG_t[3] - FG_t[0] + 1
 
 D = 2
+test_num = 1000
 
+optimal_state_sequence = dict()
+optimal_control_sequence = dict()
 
-optimal_state_sequence = [[1, 0, 1, 0]]
-optimal_control_sequence = []
+for i in range(test_num):
+    optimal_state_sequence[i] = [[1, 0, 1, 0]]
+    optimal_control_sequence[i] = []
 
 
 

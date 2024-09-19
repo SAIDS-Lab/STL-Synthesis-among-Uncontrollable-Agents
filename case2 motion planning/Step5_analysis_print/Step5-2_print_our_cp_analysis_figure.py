@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
@@ -35,7 +35,7 @@ def print_nonconformity(c_open, c_close, nonconformity_list_r_open, nonconformit
     ax[0].legend(fontsize=font_size, loc='upper right')
     ax[1].legend(fontsize=font_size, loc='upper right')
     fig.tight_layout()
-    fig.savefig("fig/case2_nonconformity.pdf")
+    fig.savefig("case2 motion planning/fig/case2_nonconformity.pdf")
 
 
 
@@ -53,23 +53,23 @@ def print_stmtresult(stmt_1_coverages, stmt_2_coverages):
         ax[i].tick_params(axis='y', labelsize = label_size)
         ax[i].axvline(x = 0.85, color = "r")
     ax[0].set_title("Empirical Coverage of (3)", fontsize=font_size)
-    ax[1].set_title("Empirical Coverage of (4)", fontsize=font_size)
+    ax[1].set_title("Empirical Coverage of (15)", fontsize=font_size)
     fig.tight_layout()
-    fig.savefig("fig/case2_stmtresult.pdf")
+    fig.savefig("case2 motion planning/fig/case2_stmtresult.pdf")
 
 
 if __name__ == "__main__":
-    with open("data_cp/c_open.json") as f:
+    with open("case2 motion planning/data_cp/c_open.json") as f:
         c_open = json.load(f)
-    with open("data_cp/c_close.json") as f:
+    with open("case2 motion planning/data_cp/c_close.json") as f:
         c_close = json.load(f)
-    with open('data_cp/r_open_nonconformity_list.json') as f:
+    with open('case2 motion planning/data_cp/r_open_nonconformity_list.json') as f:
         nonconformity_list_r_open = json.load(f)[:-1]
-    with open('data_cp/r_close_nonconformity_list.json') as f:
+    with open('case2 motion planning/data_cp/r_close_nonconformity_list.json') as f:
         nonconformity_list_r_close = json.load(f)[:-1]
-    with open('data_cp/test_result_stmt_1.json') as f:
+    with open('case2 motion planning/data_cp/test_result_stmt_1.json') as f:
         stmt_1_coverages = json.load(f)
-    with open('data_cp/test_result_stmt_2.json') as f:
+    with open('case2 motion planning/data_cp/test_result_stmt_2.json') as f:
         stmt_2_coverages = json.load(f)
 
     print_nonconformity(c_open, c_close, nonconformity_list_r_open, nonconformity_list_r_close)

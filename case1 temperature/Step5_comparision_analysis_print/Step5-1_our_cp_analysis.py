@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
@@ -12,34 +12,34 @@ import random
 random.seed(123)
 bin_width= 0.01
 
-with open("data_cp/c_open.json") as f:
+with open("case1 temperature/data_cp/c_open.json") as f:
     c_open = json.load(f)
-with open("data_cp/c_close.json") as f:
+with open("case1 temperature/data_cp/c_close.json") as f:
     c_close = json.load(f)
 
 
 # Calculate the percentage of test data satisfying theorem 1:
-with open('data_original/room2_test.json') as f:
+with open('case1 temperature/data_original/room2_test.json') as f:
     room2_test = json.load(f)
-with open('data_original/room3_test.json') as f:
+with open('case1 temperature/data_original/room3_test.json') as f:
     room3_test = json.load(f)
-with open('data_original/room2_calib.json') as f:
+with open('case1 temperature/data_original/room2_calib.json') as f:
     room2_cal = json.load(f)
-with open('data_original/room3_calib.json') as f:
+with open('case1 temperature/data_original/room3_calib.json') as f:
     room3_cal = json.load(f)
-with open('data_cp/room2_sigmas.json') as f:
+with open('case1 temperature/data_cp/room2_sigmas.json') as f:
     room2_sigmas = json.load(f)
-with open('data_cp/room3_sigmas.json') as f:
+with open('case1 temperature/data_cp/room3_sigmas.json') as f:
     room3_sigmas = json.load(f)
 
 print("Load predictions.")
-with open('data_cp/room2_test_prediction.json', 'r') as f:
+with open('case1 temperature/data_pre_control/room2_test_predictions.json', 'r') as f:
     room2_test_prediction = json.load(f)
-with open('data_cp/room3_test_prediction.json', 'r') as f:
+with open('case1 temperature/data_pre_control/room3_test_predictions.json', 'r') as f:
     room3_test_prediction = json.load(f)
-with open('data_cp/room2_calib_prediction.json', 'r') as f:
+with open('case1 temperature/data_cp/room2_calib_prediction.json', 'r') as f:
     room2_calib_prediction = json.load(f)
-with open('data_cp/room3_calib_prediction.json', 'r') as f:
+with open('case1 temperature/data_cp/room3_calib_prediction.json', 'r') as f:
     room3_calib_prediction = json.load(f)
 
 
@@ -62,16 +62,18 @@ def compute_quantiles(delta, room2_calib, room2_calib_prediction, room3_calib, r
     # print(r_open_nonconformity_list)
     c_open = r_open_nonconformity_list[p - 1]
 
+
     r_close_nonconformity_list = []
     for j in range(len(room2_calib)):
         r = []
         for k in range(total_time - 1):
-            ground2, ground3 = room2_calib[j][buffer + k + 1], room3_calib[j][buffer + k + 1]
-            prediction2, prediction3 = room2_calib_prediction[str(k)][j][0], room3_calib_prediction[str(k)][j][0]
-            nonconformity_room2 = abs(ground2 - prediction2) / room2_sigmas[str(k)][str(k+1)]
-            nonconformity_room3 = abs(ground3 - prediction3) / room3_sigmas[str(k)][str(k+1)]
-            r.append(nonconformity_room2)
-            r.append(nonconformity_room3)
+            for tau in range(k + 1, total_time):
+                ground2, ground3 = room2_calib[j][buffer + tau], room3_calib[j][buffer + tau]
+                prediction2, prediction3 = room2_calib_prediction[str(k)][j][tau-k-1], room3_calib_prediction[str(k)][j][tau-k-1]
+                nonconformity_room2 = abs(ground2 - prediction2) / room2_sigmas[str(k)][str(tau)]
+                nonconformity_room3 = abs(ground3 - prediction3) / room3_sigmas[str(k)][str(tau)]
+                r.append(nonconformity_room2)
+                r.append(nonconformity_room3)
         r_close_nonconformity_list.append(max(r))
 
     p = int(np.ceil((len(room2_calib) + 1) * (1 - delta)))
@@ -98,7 +100,7 @@ def sample_from_test_predictions(data_set, sample_inds):
     return new_data_set
 
 num_trials = 1000
-num_samples_each_trial = 50
+num_samples_each_trial = 150
 bin_width= 1/num_samples_each_trial
 
 for i in range(num_trials):
@@ -136,9 +138,10 @@ for i in range(num_trials):
     count = 0
     correct_count = 0
     for k in range(len(test_predictions_room_2_sample["0"][0])):
-        if abs(room2_test_sample[0][buffer + k + 1] - test_predictions_room_2_sample[str(k)][0][0]) <= c2 * room2_sigmas[str(k)][str(k + 1)] and abs(room3_test_sample[0][buffer + k + 1] - test_predictions_room_3_sample[str(k)][0][0]) <= c2 * room3_sigmas[str(k)][str(k + 1)]:
-            correct_count += 1
-        count += 1
+        for tau in range(k + 1, len(test_predictions_room_2_sample["0"][0])):
+            if abs(room2_test_sample[0][buffer + tau] - test_predictions_room_2_sample[str(k)][0][tau-k-1]) <= c2 * room2_sigmas[str(k)][str(tau)] and abs(room3_test_sample[0][buffer + tau] - test_predictions_room_3_sample[str(k)][0][tau-k-1]) <= c2 * room3_sigmas[str(k)][str(tau)]:
+                correct_count += 1
+            count += 1
     if count == correct_count:
         stmt_2_value += 1
 
@@ -160,16 +163,17 @@ for i in range(num_trials):
         count = 0
         correct_count = 0
         for k in range(len(test_predictions_room_2_sample["0"][0])):
-            if abs(room2_test_sample[j][buffer + k + 1] - test_predictions_room_2_sample[str(k)][j][0]) <= c2 * room2_sigmas[str(k)][str(k + 1)] and abs(room3_test_sample[j][buffer + k + 1] - test_predictions_room_3_sample[str(k)][j][0]) <= c2 * room3_sigmas[str(k)][str(k + 1)]:
-                correct_count += 1
-            count += 1
+            for tau in range(k + 1, len(test_predictions_room_2_sample["0"][0])):
+                if abs(room2_test_sample[j][buffer + tau] - test_predictions_room_2_sample[str(k)][j][tau-k-1]) <= c2 * room2_sigmas[str(k)][str(tau)] and abs(room3_test_sample[j][buffer + tau] - test_predictions_room_3_sample[str(k)][j][tau-k-1]) <= c2 * room3_sigmas[str(k)][str(tau)]:
+                    correct_count += 1
+                count += 1
         if count == correct_count:
             correct_count_stmt_2 += 1
     stmt_2_coverages.append(correct_count_stmt_2 / num_samples_each_trial)
 
-with open('data_cp/test_result_stmt_1.json', 'w') as f:
+with open('case1 temperature/data_cp/test_result_stmt_1.json', 'w') as f:
     json.dump(stmt_1_coverages, f)
-with open('data_cp/test_result_stmt_2.json', 'w') as f:
+with open('case1 temperature/data_cp/test_result_stmt_2.json', 'w') as f:
     json.dump(stmt_2_coverages, f)
 
 print("the result 1 in the paper is", stmt_1_value/num_trials)

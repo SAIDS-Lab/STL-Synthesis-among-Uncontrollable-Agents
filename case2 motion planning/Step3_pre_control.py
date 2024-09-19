@@ -18,13 +18,13 @@ def generate_predictions(data, len_in, model):
 
 if __name__ == '__main__':
     print("Starting to prepare for the control, including: compute predicitons for test data; copy useful data to the file called data_pre_control. \n")
-    with open("data_original/r2_test.json") as f:
+    with open("case2 motion planning/data_original/r2_test.json") as f:
         r2_test = json.load(f)
-    with open("data_cp/c_open.json") as f:
+    with open("case2 motion planning/data_cp/c_open.json") as f:
         c_open = json.load(f)
-    with open("data_cp/c_close.json") as f:
+    with open("case2 motion planning/data_cp/c_close.json") as f:
         c_close = json.load(f)
-    with open("data_cp/r2_sigmas.json") as f:
+    with open("case2 motion planning/data_cp/r2_sigmas.json") as f:
         r2_sigmas = json.load(f)
 
     c_close_r2 = dict()
@@ -40,19 +40,19 @@ if __name__ == '__main__':
 
     r2_test_predictions = dict()
     for k in range(total_time - 1):
-        model = keras.models.load_model(f'predictors/predictor_{k}.keras')
+        model = keras.models.load_model(f'case2 motion planning/predictors/predictor_{k}.keras')
         len_in = k + 1
         r2_test_predictions[k] = generate_predictions(r2_test, len_in, model)
 
     r2_ground = r2_test
 
-    with open('data_pre_control/r2_test_predictions.json', 'w') as f:
+    with open('case2 motion planning/data_pre_control/r2_test_predictions.json', 'w') as f:
         json.dump(r2_test_predictions, f)
-    with open('data_pre_control/r2_ground.json', 'w') as f:
+    with open('case2 motion planning/data_pre_control/r2_ground.json', 'w') as f:
         json.dump(r2_ground, f)
-    with open('data_pre_control/c_close_r2.json', 'w') as f:
+    with open('case2 motion planning/data_pre_control/c_close_r2.json', 'w') as f:
         json.dump(c_close_r2, f)
-    with open('data_pre_control/c_open_r2.json', 'w') as f:
+    with open('case2 motion planning/data_pre_control/c_open_r2.json', 'w') as f:
         json.dump(c_open_r2, f)
 
     print("We have finished all the preparation for the control. Let's design a controller now! \n")

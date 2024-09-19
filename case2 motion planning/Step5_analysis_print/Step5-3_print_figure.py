@@ -1,6 +1,6 @@
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case2 motion planning'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
@@ -55,6 +55,7 @@ def PrintPaperFig(r1_trace_list_closed, r2_trace_list_closed, r1_trace_list_open
         circle_list = []
         for tau in range(k+1, total_time):
             circle_list.append(Circle((path2[tau, 0], path2[tau, 1]), c[str(tau)], fill=False, color='blue', linestyle='dashed', alpha = 0.5))
+            
         for circle in circle_list:
             ax[i].add_patch(circle)
 
@@ -76,20 +77,19 @@ def PrintPaperFig(r1_trace_list_closed, r2_trace_list_closed, r1_trace_list_open
     
     fig.legend(fontsize = 12, loc='center right')
     fig.tight_layout(rect=[0, 0, 0.84, 1])
-    # plt.show()
-    plt.savefig("fig/case2_trace.pdf")
+    plt.savefig("case2 motion planning/fig/case2_trace.pdf")
 
 
 
 
 if __name__ == "__main__":
-    with open("data_controlresults/r1_trace_list_closedloop.json") as f:
+    with open("case2 motion planning/data_controlresults/r1_trace_list_closedloop.json") as f:
         r1_trace_list_closedloop = json.load(f)
-    with open("data_controlresults/r2_trace_list_closedloop.json") as f:
+    with open("case2 motion planning/data_controlresults/r2_trace_list_closedloop.json") as f:
         r2_trace_list_closedloop = json.load(f)
-    with open("data_controlresults/r1_trace_list_openloop.json") as f:
+    with open("case2 motion planning/data_controlresults/r1_trace_list_openloop.json") as f:
         r1_trace_list_openloop = json.load(f)
-    with open("data_controlresults/r2_trace_list_openloop.json") as f:
+    with open("case2 motion planning/data_controlresults/r2_trace_list_openloop.json") as f:
         r2_trace_list_openloop = json.load(f)
 
     index  = 0

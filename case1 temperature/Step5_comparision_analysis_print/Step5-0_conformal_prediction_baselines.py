@@ -5,10 +5,11 @@ In this file, we compare the LCP-based CP algorithm with our methods for open lo
 import json
 import sys
 import os
-module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
+module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from parameters import *
+from Step4_control.parameters_control import *
 import casadi as ca
 import numpy as np
 import time
@@ -98,7 +99,7 @@ def perform_cp(alphas_opt, nonconformity_scores_cp):
     normalized.append(float("inf"))
     normalized.sort()
     c_open = normalized[p - 1]
-    return c_open, normalized
+    return c_open
 
 
 def compute_sigmas(data, data_predictions):
@@ -114,7 +115,7 @@ def compute_sigmas(data, data_predictions):
     return sigmas_open
 
 
-def compute_quantiles(delta, room2_calib, room2_calib_prediction, room3_calib, room3_calib_prediction, room2_sigmas, room3_sigmas):
+def compute_quantiles_ours(delta, room2_calib, room2_calib_prediction, room3_calib, room3_calib_prediction, room2_sigmas, room3_sigmas):
     r_open_nonconformity_list = []
     for j in range(len(room2_calib)):
         r = []
@@ -135,21 +136,21 @@ def compute_quantiles(delta, room2_calib, room2_calib_prediction, room3_calib, r
 
 def compare():
     # Load data from files.
-    with open("data_original/room2_train.json") as f:
+    with open("case1 temperature/data_original/room2_train.json") as f:
         room2_train = json.load(f)
-    with open("data_original/room3_train.json") as f:
+    with open("case1 temperature/data_original/room3_train.json") as f:
         room3_train = json.load(f)
-    with open("data_original/room2_calib.json") as f:
+    with open("case1 temperature/data_original/room2_calib.json") as f:
         room2_calib = json.load(f)
-    with open("data_original/room3_calib.json") as f:
+    with open("case1 temperature/data_original/room3_calib.json") as f:
         room3_calib = json.load(f)
-    with open("data_cp/room2_train_prediction.json") as f:
+    with open("case1 temperature/data_cp/room2_train_prediction.json") as f:
         room2_train_prediction = json.load(f)
-    with open("data_cp/room3_train_prediction.json") as f:
+    with open("case1 temperature/data_cp/room3_train_prediction.json") as f:
         room3_train_prediction = json.load(f)
-    with open("data_cp/room2_calib_prediction.json") as f:
+    with open("case1 temperature/data_cp/room2_calib_prediction.json") as f:
         room2_calib_prediction = json.load(f)
-    with open("data_cp/room3_calib_prediction.json") as f:
+    with open("case1 temperature/data_cp/room3_calib_prediction.json") as f:
         room3_calib_prediction = json.load(f)
 
         # Proceed with The LCP Algorithm.
@@ -161,7 +162,7 @@ def compare():
     print("Starting to compute alphas via solving the LCP.")
     alphas_opt = compute_alphas_lcp(nonconformity_scores_opt)
     print("Starting to perform conformal prediction.")
-    lcp_c_open, lcp_normalized = perform_cp(alphas_opt, nonconformity_scores_cp)
+    lcp_c_open = perform_cp(alphas_opt, nonconformity_scores_cp)
     print("C computed with the LCP method:", lcp_c_open)
     print("C has been obtained.")
     print("End timer.")
@@ -173,46 +174,100 @@ def compare():
     start = time.time()
     room2_sigmas = compute_sigmas(room2_train, room2_train_prediction)
     room3_sigmas = compute_sigmas(room3_train, room3_train_prediction)
-    our_c_open = compute_quantiles(delta, room2_calib, room2_calib_prediction, room3_calib, room3_calib_prediction, room2_sigmas, room3_sigmas)
+    print("room2_sigmas", room2_sigmas)
+    print("room3_sigmas", room3_sigmas)
+    our_c_open = compute_quantiles_ours(delta, room2_calib, room2_calib_prediction, room3_calib, room3_calib_prediction, room2_sigmas, room3_sigmas)
     print("Our computed C:", our_c_open)
     print("End timer.")
-    print("Time elapsed:", time.time() - start, "seconds for Our Method.")
+    print("Time elapsed:", time.time() - start, "seconds for Our method.")
+
 
     # Compare the prediction regions.
     print("Compute prediction regions for LCP, Room 2.")
-    prediction_regions_lcp_room_2 = []
+    regions_lcp_room_2 = []
     for t in range(total_time - 1):
-        prediction_regions_lcp_room_2.append(lcp_c_open / alphas_opt[t])
-    print("Computing prediction regions for Our Method, Room 2.")
-    prediction_regions_our_room_2 = []
-    for t in range(1, total_time):
-        prediction_regions_our_room_2.append(our_c_open * room2_sigmas[0][t])
+        regions_lcp_room_2.append(lcp_c_open / alphas_opt[t])
     print("Compute prediction regions for LCP, Room 3.")
-    prediction_regions_lcp_room_3 = []
+    regions_lcp_room_3 = []
     for t in range(total_time - 1, len(alphas_opt)):
-        prediction_regions_lcp_room_3.append(lcp_c_open / alphas_opt[t])
-    print("Compute prediction regions for Our Method, Room 3.")
-    prediction_regions_our_room_3 = []
+        regions_lcp_room_3.append(lcp_c_open / alphas_opt[t])
+    
+    print("Compute prediction regions for Our Method, Room 2.")
+    regions_our_room_2 = []
     for t in range(1, total_time):
-        prediction_regions_our_room_3.append(our_c_open * room3_sigmas[0][t])
+        regions_our_room_2.append(our_c_open * room2_sigmas[0][t])
+    print("Compute prediction regions for Our Method, Room 3.")
+    regions_our_room_3 = []
+    for t in range(1, total_time):
+        regions_our_room_3.append(our_c_open * room3_sigmas[0][t])
 
-    print("Plotting the prediction regions.")
-    plt.scatter(range(1, total_time), prediction_regions_lcp_room_2, label="LCP Method", color="red")
-    plt.scatter(range(1, total_time), prediction_regions_our_room_2, label="Our Method", color="blue")
-    plt.legend()
-    plt.xlabel("Time")
-    plt.ylabel("Prediction Regions (Radius)")
-    plt.title("Open-loop Prediction Regions for Room 2 by LCP and Our Method")
-    plt.show()
 
-    plt.scatter(range(1, total_time), prediction_regions_lcp_room_3, label="LCP Method", color="red")
-    plt.scatter(range(1, total_time), prediction_regions_our_room_3, label="Our Method", color="blue")
-    plt.legend()
-    plt.xlabel("Time")
-    plt.ylabel("Prediction Regions (Radius)")
-    plt.title("Open-loop Prediction Regions for Room 3 by LCP and Our Method")
-    plt.show()
+    with open('case1 temperature/data_comparison/room2_regions_lcp.json', 'w') as f:
+        json.dump(regions_lcp_room_2, f)
+    with open('case1 temperature/data_comparison/room3_regions_lcp.json', 'w') as f:
+        json.dump(regions_lcp_room_3, f)
+    with open('case1 temperature/data_comparison/room2_regions_ours.json', 'w') as f:
+        json.dump(regions_our_room_2, f)
+    with open('case1 temperature/data_comparison/room3_regions_ours.json', 'w') as f:
+        json.dump(regions_our_room_3, f)
 
+
+
+def PrintPaperFigComp(r2_trace_list_open, r3_trace_list_open):
+    fig, ax = plt.subplots(1, 2, figsize=(8, 3))
+    font_size = 14
+    r2_trace_list = r2_trace_list_open
+    r3_trace_list = r3_trace_list_open
+
+    with open('case1 temperature/data_comparison/room2_regions_ours.json') as f:
+        room2_regions_ours = json.load(f)
+    with open('case1 temperature/data_comparison/room3_regions_ours.json') as f:
+        room3_regions_ours = json.load(f)
+    with open('case1 temperature/data_comparison/room2_regions_lcp.json') as f:
+        room2_regions_lcp = json.load(f)
+    with open('case1 temperature/data_comparison/room3_regions_lcp.json') as f:
+        room3_regions_lcp = json.load(f)
+
+    r2_pred_upper = [[r2_trace_list[0]], [r2_trace_list[0]]]
+    r2_pred_lower = [[r2_trace_list[0]], [r2_trace_list[0]]]
+    r3_pred_upper = [[r3_trace_list[0]], [r3_trace_list[0]]]
+    r3_pred_lower = [[r3_trace_list[0]], [r3_trace_list[0]]]
+    for tau in range(1, total_time):
+        r2_pred_upper[0].append(r2_trace_list[tau] + room2_regions_ours[tau-1])
+        r2_pred_lower[0].append(r2_trace_list[tau] - room2_regions_ours[tau-1])
+        r3_pred_upper[0].append(r3_trace_list[tau] + room3_regions_ours[tau-1])
+        r3_pred_lower[0].append(r3_trace_list[tau] - room3_regions_ours[tau-1])
+        r2_pred_upper[1].append(r2_trace_list[tau] + room2_regions_lcp[tau-1])
+        r2_pred_lower[1].append(r2_trace_list[tau] - room2_regions_lcp[tau-1])
+        r3_pred_upper[1].append(r3_trace_list[tau] + room3_regions_lcp[tau-1])
+        r3_pred_lower[1].append(r3_trace_list[tau] - room3_regions_lcp[tau-1])
+        
+    for i in range(2):
+        ax[i].plot(np.arange(total_time), r2_pred_upper[i], alpha=0)
+        ax[i].plot(np.arange(total_time), r2_pred_lower[i], alpha=0)
+        ax[i].plot(np.arange(total_time), r3_pred_upper[i], alpha=0)
+        ax[i].plot(np.arange(total_time), r3_pred_lower[i], alpha=0)
+        ax[i].fill_between(np.arange(total_time), r2_pred_upper[i], r2_pred_lower[i], where=np.array(r2_pred_upper[i]) > np.array(r2_pred_lower[i]), interpolate=True, alpha=0.1, color = "red", label = "Predicted region of $Y_1$" if i == 0 else None)
+        ax[i].fill_between(np.arange(total_time), r3_pred_upper[i], r3_pred_lower[i], where=np.array(r3_pred_upper[i]) > np.array(r3_pred_lower[i]), interpolate=True, alpha=0.1, color = "blue", label = "Predicted region of $Y_2$" if i == 0 else None)
+        ax[i].plot(np.arange(total_time), r2_trace_list, linestyle=':', linewidth=1, color = "red")
+        ax[i].plot(np.arange(total_time), r3_trace_list, linestyle=':', linewidth=1, color = "blue")
+
+    for i in range(2):
+        ax[i].tick_params(axis='x', labelsize=10)
+        ax[i].tick_params(axis='y', labelsize=10)
+        ax[i].set_ylim(13,28)
+
+    ax[0].legend(fontsize = 12, loc='lower right')
+    ax[0].set_title('Our result', fontsize=font_size-3)
+    ax[1].set_title('Result from [Cleaveland et al.(2024)]', fontsize=font_size-3)
+    plt.savefig("case1 temperature/fig/case1_comp.pdf")
 
 if __name__ == '__main__':
     compare()
+
+    with open("case1 temperature/data_controlresults/r2_trace_list_openloop.json") as f:
+        r2_trace_list_openloop = json.load(f)
+    with open("case1 temperature/data_controlresults/r3_trace_list_openloop.json") as f:
+        r3_trace_list_openloop = json.load(f)
+
+    PrintPaperFigComp(r2_trace_list_openloop[str(0)], r3_trace_list_openloop[str(0)])
