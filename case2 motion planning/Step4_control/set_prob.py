@@ -22,7 +22,7 @@ def Solve_Prob(k, test_index, r2_trace, r2_c):
     G_track_mu_4, q = addConstr(Robot, test_index, x1, u1, r2_trace, k, r2_c)
     # set objective
     obj = Robot.addVar(vtype="C", name="obj")
-    Robot.addCons(obj == sum(0.03*sum(x1[i, j]*x1[i, j] for j in [1,3])  + 0.97*sum(u1[i, j]*u1[i, j] for j in range(2)) for i in range(0, total_time-1)))
+    Robot.addCons(obj == sum(0.03*sum(x1[i+1, j]*x1[i+1, j] for j in [1,3])  + 0.97*sum(u1[i, j]*u1[i, j] for j in range(2)) for i in range(0, total_time-1)))
     Robot.setObjective(obj, "minimize")
     Robot.data = x1, u1,G_track_mu_4, q
 

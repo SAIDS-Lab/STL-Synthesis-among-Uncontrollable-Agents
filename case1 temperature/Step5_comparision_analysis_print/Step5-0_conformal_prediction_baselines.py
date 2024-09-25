@@ -214,7 +214,7 @@ def compare():
 
 
 def PrintPaperFigComp(r2_trace_list_open, r3_trace_list_open):
-    fig, ax = plt.subplots(1, 2, figsize=(8, 3))
+    fig, ax = plt.subplots(1, 2, figsize=(8, 3.5))
     font_size = 14
     r2_trace_list = r2_trace_list_open
     r3_trace_list = r3_trace_list_open
@@ -253,21 +253,22 @@ def PrintPaperFigComp(r2_trace_list_open, r3_trace_list_open):
         ax[i].plot(np.arange(total_time), r3_trace_list, linestyle=':', linewidth=1, color = "blue")
 
     for i in range(2):
-        ax[i].tick_params(axis='x', labelsize=10)
-        ax[i].tick_params(axis='y', labelsize=10)
+        ax[i].tick_params(axis='x', labelsize=11)
+        ax[i].tick_params(axis='y', labelsize=11)
         ax[i].set_ylim(13,28)
 
     ax[0].legend(fontsize = 12, loc='lower right')
-    ax[0].set_title('Our result', fontsize=font_size-3)
-    ax[1].set_title('Result from [Cleaveland et al.(2024)]', fontsize=font_size-3)
+    ax[0].set_title('Our result', fontsize=font_size)
+    ax[1].set_title('Result from [Cleaveland et al.(2024)]', fontsize=font_size)
+    fig.tight_layout()
     plt.savefig("case1 temperature/fig/case1_comp.pdf")
 
 if __name__ == '__main__':
-    compare()
+    # compare()
 
-    with open("case1 temperature/data_controlresults/r2_trace_list_openloop.json") as f:
+    with open("case1 temperature/data_controlresults/r2_trace_list_openloop_qualitative.json") as f:
         r2_trace_list_openloop = json.load(f)
-    with open("case1 temperature/data_controlresults/r3_trace_list_openloop.json") as f:
+    with open("case1 temperature/data_controlresults/r3_trace_list_openloop_qualitative.json") as f:
         r3_trace_list_openloop = json.load(f)
 
     PrintPaperFigComp(r2_trace_list_openloop[str(0)], r3_trace_list_openloop[str(0)])

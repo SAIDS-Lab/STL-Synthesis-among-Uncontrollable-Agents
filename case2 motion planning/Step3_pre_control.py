@@ -8,9 +8,7 @@ from Step2_conformal_prediction import *
 
 def generate_predictions(data, len_in, model):
     data_x = [item[:len_in] for item in data]
-    data_y = [item[len_in:len_seq] for item in data]
     data_x = np.array(data_x).reshape(-1, len(data_x[0]), 2)
-    data_y = np.array(data_y).reshape(-1, len(data_y[0]), 2)
     return model.predict(data_x).tolist()
 
 

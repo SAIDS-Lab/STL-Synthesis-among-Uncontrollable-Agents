@@ -48,12 +48,12 @@ def analysis(mode):
     average_time_openloop = sum(value for value in time_openloop.values() if value) / num_feasibility_openloop
     each_robustness = comp_robust_openloop(r1_trace_list_openloop, r2_trace_list, r3_trace_list)
     average_robustness_openloop = np.mean(each_robustness)
-    prob_task_sat_openloop = len([i for i in each_robustness if i >= 0]) / len(each_robustness)
+    num_task_sat_openloop = len([i for i in each_robustness if i >= 0])
     print("Here is the result of open loop analysis:")
     print("number of feasible cases: ", num_feasibility_openloop)
     print("average computation time: ", average_time_openloop)
     print("average robustness: ", average_robustness_openloop)
-    print("probability of satisfying the task: ", prob_task_sat_openloop)
+    print("number of satisfying the task: ", num_task_sat_openloop)
     print("\n")
 
     # closed loop
@@ -66,14 +66,14 @@ def analysis(mode):
     average_time_closedloop = np.mean(each_time_sum)
     each_robustness = comp_robust_closedloop(r1_trace_list_closedloop, r2_trace_list, r3_trace_list)
     average_robustness_closedloop = np.mean(each_robustness)
-    prob_task_sat_closedloop = len([i for i in each_robustness if i >= 0]) / num_initial_feasibility_closedloop
+    num_task_sat_closedloop = len([i for i in each_robustness if i >= 0]) 
 
     print("Here is the result of closed loop analysis:")
     print("number of initial feasible cases: ", num_initial_feasibility_closedloop)
     print("number of recursive feasible cases: ", num_recursive_feasibility_closedloop)
     print("average total computation time: ", average_time_closedloop)
     print("average robustness: ", average_robustness_closedloop)
-    print("probability of satisfying the task: ", prob_task_sat_closedloop)
+    print("number of satisfying the task: ", num_task_sat_closedloop)
     print("\n")
 
 
