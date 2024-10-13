@@ -38,7 +38,7 @@ class MPC:
 
     # Note that due to the nonconvexity, the solver not being able to find a solution doesn't mean that the problem is infeasible.
     # This function is used to check if the solution from the last time step is feasible when the solver cannot find a solution at the current time step.
-    # If you are only interested in the qualitative encoding, you can skip this function.
+
     def check(self, test_index, r2_trace_list, r3_trace_list, last_x, last_u):
         r2_trace = r2_ground[self.test_index][:self.k+1]
         r3_trace = r3_ground[self.test_index][:self.k+1]

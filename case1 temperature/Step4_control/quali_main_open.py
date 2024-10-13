@@ -9,7 +9,7 @@ for i in range(test_num):
     print("the executing index of the test data is", i+1)
     r1_trace_list[i], r2_trace_list[i], r3_trace_list[i], time[i] = dict(), dict(), dict(), dict()
     mpc = MPC(0, i, c_open_room2, c_open_room3)
-    r1_trace, r2_trace, r3_trace, time_cost, status = mpc.solve(i, r2_trace_list[i], r3_trace_list[i])
+    r1_trace, r2_trace, r3_trace, time_cost, status, u = mpc.solve(i, r2_trace_list[i], r3_trace_list[i])
     if status != "1":
         print("The problem is infeasible")
         infeasible_time_list.append([i, 0])

@@ -31,8 +31,36 @@ class MPC:
             self.input = u
             optimal_state_sequence[test_index].append(x[self.k+1])
             optimal_control_sequence[test_index].append(u[self.k])
-            return x, r2_trace, r3_trace, time, status
+            return x, r2_trace, r3_trace, time, status, u
         else:
-            return None, None, None, None, status
+            return None, None, None, None, status, None
 
-   
+
+
+
+
+
+    # Note that due to the nonconvexity, the solver not being able to find a solution doesn't mean that the problem is infeasible.
+    # This function is used to check if the solution from the last time step is feasible when the solver cannot find a solution at the current time step.
+
+    def check(self, test_index, r2_trace_list, r3_trace_list, last_x, last_u):
+        r2_trace = r2_ground[self.test_index][:self.k+1]
+        r3_trace = r3_ground[self.test_index][:self.k+1]
+        for tau in range(len(y2_prediction_list[str(self.k)][self.test_index])):
+            r2_trace.append(y2_prediction_list[str(self.k)][self.test_index][tau])
+            r3_trace.append(y3_prediction_list[str(self.k)][self.test_index][tau])
+        
+        r2_trace_list[self.k] = r2_trace
+        r3_trace_list[self.k] = r3_trace
+            
+        x, u, time, status = check_Prob(self.k, test_index, self.c_room2, self.c_room3, r2_trace_list, r3_trace_list, last_x, last_u)
+
+        # optimized results
+        if status == "1":  # feasible
+            self.state = x
+            self.input = u
+            optimal_state_sequence[test_index].append(x[self.k+1])
+            optimal_control_sequence[test_index].append(u[self.k])
+            return x, r2_trace, r3_trace, time, status, u
+        else:
+            return None, None, None, None, status, None

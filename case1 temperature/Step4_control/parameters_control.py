@@ -36,18 +36,19 @@ for i in range(test_num):
 
 total_time = 33
 umax = 1
-M = 100000
+M = 1000
 
-G_t = [1, total_time-1 - 2]
-F_t = [0,2]
-G_len = G_t[1] - G_t[0] + 1
-GF_len = G_t[1] + F_t[1] - G_t[0] + 1
+
+F_t = [0, 2]
+G_t = [0, 30]
 F_len = F_t[1] - F_t[0] + 1
-bound = 5
-epsilon = 0.0001
+G_len = G_t[1] - G_t[0] + 1
+FG_len = G_t[1] + F_t[1] + 1
 
-# qualitative or quantitative
-mode = "quantitative" 
+
+bound = 5
+epsilon = 0.01
+
 
 
 

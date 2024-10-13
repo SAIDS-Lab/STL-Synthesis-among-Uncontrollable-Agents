@@ -1,6 +1,6 @@
 import sys
 import os
-module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
+module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from Step4_control.parameters_control import *
@@ -16,18 +16,22 @@ def comp_robust_openloop(r1_trace_list, r2_trace_list, r3_trace_list):
     each_robustness = []
     for key, value in r1_trace_list.items():
         if value:
-            mu = [min(5-r1_trace_list[key][i] + r2_trace_list[int(key)][i], 5 + r1_trace_list[key][i] - r2_trace_list[int(key)][i], 5-r1_trace_list[key][i] + r3_trace_list[int(key)][i], 5 + r1_trace_list[key][i] - r3_trace_list[int(key)][i]) for i in range(len(r1_trace_list[key]))]
-            mu_or_F_mu = [max(mu[i], mu[i+1], mu[i+2]) for i in range(G_len)]
-            each_robustness.append(min(mu_or_F_mu[i] for i in range(1, G_len)))
+            mu1 = [min(bound-r1_trace_list[key][i] + r2_trace_list[int(key)][i], bound + r1_trace_list[key][i] - r2_trace_list[int(key)][i], bound-r1_trace_list[key][i] + r3_trace_list[int(key)][i], bound + r1_trace_list[key][i] - r3_trace_list[int(key)][i]) for i in range(len(r1_trace_list[key]))]
+            Gmu1 = [min(mu1[i+j] for j in range(G_len)) for i in range(F_len)]
+            FGmu1 = max(Gmu1)
+            each_robustness.append(FGmu1)
+            
     return each_robustness
 
 def comp_robust_closedloop(r1_trace_list, r2_trace_list, r3_trace_list):
     each_robustness = []
     for key, value in r1_trace_list.items():
         if len(value) >= 32:
-            mu = [min(5-r1_trace_list[key][str(31)][i] + r2_trace_list[int(key)][i], 5 + r1_trace_list[key][str(31)][i] - r2_trace_list[int(key)][i], 5-r1_trace_list[key][str(31)][i] + r3_trace_list[int(key)][i], 5 + r1_trace_list[key][str(31)][i] - r3_trace_list[int(key)][i]) for i in range(len(r1_trace_list[key][str(31)]))]
-            mu_or_F_mu = [max(mu[i], mu[i+1], mu[i+2]) for i in range(G_len)]
-            each_robustness.append(min(mu_or_F_mu[i] for i in range(1, G_len)))
+            mu1 = [min(bound-r1_trace_list[key][str(31)][i] + r2_trace_list[int(key)][i], bound + r1_trace_list[key][str(31)][i] - r2_trace_list[int(key)][i], bound-r1_trace_list[key][str(31)][i] + r3_trace_list[int(key)][i], bound + r1_trace_list[key][str(31)][i] - r3_trace_list[int(key)][i]) for i in range(len(r1_trace_list[key][str(31)]))]
+            Gmu1 = [min(mu1[i+j] for j in range(G_len)) for i in range(F_len)]
+            FGmu1 = max(Gmu1)
+            each_robustness.append(FGmu1)
+            
     return each_robustness
 
 
@@ -67,7 +71,6 @@ def analysis(mode):
     each_robustness = comp_robust_closedloop(r1_trace_list_closedloop, r2_trace_list, r3_trace_list)
     average_robustness_closedloop = np.mean(each_robustness)
     num_task_sat_closedloop = len([i for i in each_robustness if i >= 0]) 
-
     print("Here is the result of closed loop analysis:")
     print("number of initial feasible cases: ", num_initial_feasibility_closedloop)
     print("number of recursive feasible cases: ", num_recursive_feasibility_closedloop)
@@ -77,10 +80,13 @@ def analysis(mode):
     print("\n")
 
 
+
+
 if __name__ == "__main__":
     print("Qualitative analysis:")
     analysis("qualitative")
     print("\n")
+   
 
     print("Quantitative analysis:")
     analysis("quantitative")

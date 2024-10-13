@@ -18,13 +18,13 @@ def Solve_Prob(k, test_index, c_room2, c_room3, r2_trace_list, r3_trace_list):
 
     # add specification constraints and objective
     obj = case1.addVar(vtype="C", name="obj")
-    r_G = addConstr_quantitative(case1, test_index, x, u, y2, y3, k, c_room2, c_room3, r2_trace_list, r3_trace_list)
+    r = addConstr_quantitative(case1, test_index, x, u, y2, y3, k, c_room2, c_room3, r2_trace_list, r3_trace_list)
     # these are used to make the result more smooth
     # for i in range(7):
     #     case1.addCons((x[i+1]-x[i])**2 <= 2)
     # for i in range(7, total_time-1):
     #     case1.addCons((x[i+1]-x[i])**2 <= 0.4)
-    case1.addCons(obj == r_G)
+    case1.addCons(obj == r)
     case1.setObjective(obj, "maximize")
 
 
@@ -48,7 +48,7 @@ def Solve_Prob(k, test_index, c_room2, c_room3, r2_trace_list, r3_trace_list):
     
 
 
-# specialized for quantitative encoding
+
 def check_Prob(k, test_index, c_room2, c_room3, r2_trace_list, r3_trace_list, last_x, last_u):
     case1_check = Model("case1_check")
 
@@ -63,7 +63,7 @@ def check_Prob(k, test_index, c_room2, c_room3, r2_trace_list, r3_trace_list, la
 
     # add specification constraints and objective
     obj = case1_check.addVar(vtype="C", name="obj")
-    r_G= addConstr_quantitative(case1_check, test_index, x, u, y2, y3, k, c_room2, c_room3, r2_trace_list, r3_trace_list)
+    r= addConstr_quantitative(case1_check, test_index, x, u, y2, y3, k, c_room2, c_room3, r2_trace_list, r3_trace_list)
 
     # try the solution from the last time step
     for i in range(0, k+1):

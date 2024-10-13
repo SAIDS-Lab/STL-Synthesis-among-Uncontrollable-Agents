@@ -1,6 +1,6 @@
 import sys
 import os
-module_path = os.path.abspath(os.path.join('/Users/xinyiyu/Library/CloudStorage/GoogleDrive-xyu07104@usc.edu/My Drive/7 - STL with CP/auto/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
+module_path = os.path.abspath(os.path.join('please replace it with your own path/STL-Synthesis-among-Uncontrollable-Agents/case1 temperature'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 from Step4_control.parameters_control import *
@@ -12,7 +12,6 @@ def PrintPaperFig(mode, r1_trace_list_closed, r2_trace_list_closed, r3_trace_lis
     fig, ax = plt.subplots(1, 4, figsize=(15, 3))
     font_size = 14
 
-    # time_list = [0, 8, 20, 26]
     time_list = [0, 8, 16, 26]
     for i in range(4):
         k = time_list[i]
@@ -93,6 +92,6 @@ if __name__ == "__main__":
             r3_trace_list_openloop = json.load(f)
 
 
-        index  = 7
+        index  = 0
         PrintPaperFig(mode[i], r1_trace_list_closedloop[str(index)], r2_trace_list_closedloop[str(index)], r3_trace_list_closedloop[str(index)], r1_trace_list_openloop[str(index)], r2_trace_list_openloop[str(index)], r3_trace_list_openloop[str(index)])
     
