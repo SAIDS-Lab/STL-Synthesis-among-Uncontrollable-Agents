@@ -74,13 +74,13 @@ def addConstr_qualitative(model, test_index, x, u, y2, y3, k, c_room2, c_room3, 
                 # for room 2 mu1
                 # for this constraint, we use "y2[i] ==  (y2_trace[i] - c_room2[i])" to replace KKT (see below)
                 model.addCons(x[i] - (r2_trace_list[k][i] - c_room2[str(k)][str(i)]) - bound <= M * (1 - mu1_r2_2[i, 0]) - epsilon)
-                # we can also use the following KKT condition to solve the inner optimization problem
-                # BUT we use the explicit way as above in this case study since the predicate is very simple
-                # model.addCons(x[i] - y2[i] - bound <= M * (1 - mu_r2_2[i, 0])- epsilon)
-                # the constraints of the inner optimization problem is (y-yhat)^2 <= C^2 
-                # model.addCons(1 + vlambda[i]*2*(y2[i] - y2_trace[i]) == 0)
+                # # we can also use the following KKT condition to solve the inner optimization problem
+                # # BUT we use the explicit way as above in this case study since the predicate is very simple
+                # model.addCons(x[i] - y2[i] - bound <= M * (1 - mu1_r2_2[i, 0])- epsilon)
+                # # the constraints of the inner optimization problem is (y-yhat)^2 <= C^2 
+                # model.addCons(1 + vlambda[i]*2*(y2[i] - r2_trace_list[k][i]) == 0)
                 # model.addCons(vlambda[i] >= 0)
-                # model.addCons(temp_result[i] == (y2[i] - y2_trace[i])*(y2[i] - y2_trace[i]) - (c_room2[str(k)][str(i)])*(c_room2[str(k)][str(i)]))
+                # model.addCons(temp_result[i] == (y2[i] - r2_trace_list[k][i])*(y2[i] - r2_trace_list[k][i]) - (c_room2[str(k)][str(i)])*(c_room2[str(k)][str(i)]))
                 # model.addCons(temp_result[i] <= 0)
                 # model.addCons(vlambda[i]*temp_result[i] == 0)
                 
